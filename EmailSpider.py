@@ -2,7 +2,7 @@
 """
 Created on Tue Jan 21 11:23:57 2020
 
-@author: yangyj
+@author: william
 """
 
 '''import requests, re
