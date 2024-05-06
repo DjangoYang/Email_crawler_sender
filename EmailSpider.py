@@ -30,7 +30,7 @@ from collections import deque
 import re
 
 # a queue of urls to be crawled
-new_urls = deque(['https://www.zhipin.com/i100020-c101270100/'])
+new_urls = deque(['https://iap.nankai.edu.cn/'])
 
 # a set of urls that we have already crawled
 processed_urls = set()
@@ -59,8 +59,19 @@ while len(new_urls):
         continue
 
     # extract all email addresses and add them into the resulting set
-    new_emails = set(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
-    emails.update(new_emails)
+    #new_emails = set(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
+    #emails.update(new_emails)
+    
+    # Update the regular expression pattern to capture email addresses excluding image file extensions
+    new_emails = set(re.findall(r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.(?!png|jpg|jpeg|gif)[a-z]+", response.text, re.I))
+
+    # Add an additional filter step to exclude email addresses ending with image file extensions
+    filtered_emails = set()
+    for email in new_emails:
+        if not any(email.endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.gif']):
+            filtered_emails.add(email)
+
+    emails.update(filtered_emails)
 
     # create a beutiful soup for the html document
     soup = BeautifulSoup(response.text)
