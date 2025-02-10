@@ -2,26 +2,7 @@
 """
 Created on Tue Jan 21 11:23:57 2020
 
-@author: william
 """
-
-'''import requests, re
- 
-# regex = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
-# regex = r"([a-zA-Z0-9_.+-]+@[a-pr-zA-PRZ0-9-]+\.[a-zA-Z0-9-.]+)"  # 这个正则表达式过滤掉了qq邮箱
- 
-regex = r"([a-zA-Z0-9_.+-]+@[a-fh-pr-zA-FH-PRZ0-9-]+\.[a-zA-Z0-9-.]+)"  # 这个正则表达式过滤掉了谷歌邮箱和QQ邮箱
- 
-url = 'http://www.ccdi.gov.cn/special/zyxszt/dshierlxs_zyxs/agls_xs12_zyxs/201709/t20170901_106360.html'
-html = requests.get(url).text
- 
-emails = re.findall(regex, html)
-i = 0
-for email in emails:
-    i += 1
-    if i < 16 :
-        print("{},".format(email))'''
-        
 from bs4 import BeautifulSoup
 import requests
 import requests.exceptions
@@ -30,7 +11,7 @@ from collections import deque
 import re
 
 # a queue of urls to be crawled
-new_urls = deque(['https://iap.nankai.edu.cn/'])
+new_urls = deque(['https://www.hyit.edu.cn/'])
 
 # a set of urls that we have already crawled
 processed_urls = set()
@@ -58,10 +39,6 @@ while len(new_urls):
         # ignore pages with errors
         continue
 
-    # extract all email addresses and add them into the resulting set
-    #new_emails = set(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
-    #emails.update(new_emails)
-    
     # Update the regular expression pattern to capture email addresses excluding image file extensions
     new_emails = set(re.findall(r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.(?!png|jpg|jpeg|gif)[a-z]+", response.text, re.I))
 
@@ -69,12 +46,16 @@ while len(new_urls):
     filtered_emails = set()
     for email in new_emails:
         if not any(email.endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.gif']):
+            # Fix emails ending with a single character after the dot
+            domain_parts = email.split('.')
+            if len(domain_parts[-1]) == 1:
+                email = email + 'n'  # You can modify this logic as needed for other cases
             filtered_emails.add(email)
 
     emails.update(filtered_emails)
 
-    # create a beutiful soup for the html document
-    soup = BeautifulSoup(response.text)
+    # create a beautiful soup for the html document
+    soup = BeautifulSoup(response.text, "html.parser")
 
     # find and process all the anchors in the document
     for anchor in soup.find_all("a"):
